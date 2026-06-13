@@ -1,0 +1,23 @@
+{
+  "name": "@observiz/logs",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.10.6",
+    "@observiz/core": "workspace:*",
+    "@opentelemetry/api-logs": "^0.51.1",
+    "@opentelemetry/exporter-logs-otlp-grpc": "^0.51.1",
+    "@opentelemetry/sdk-logs": "^0.51.1",
+    "@opentelemetry/winston-transport": "^0.7.0",
+    "winston": "^3.13.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "typescript": "^5.4.5"
+  }
+}
