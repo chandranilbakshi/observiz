@@ -38,7 +38,7 @@ exporters:
   # Metrics → Prometheus (collector exposes a scrape endpoint)
   prometheus:
     endpoint: "0.0.0.0:8889"
-    namespace: sarwam
+    namespace: observiz
 
   # Logs → Loki
   loki:

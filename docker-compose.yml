@@ -81,21 +81,3 @@ services:
     networks:
       - observability
     restart: unless-stopped
-
-  example-api:
-    build:
-      context: .
-      dockerfile: example-api/Dockerfile
-    container_name: example-api
-    environment:
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
-      - OTEL_SERVICE_NAME=sarwam-api
-      - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=dev
-      - PORT=3001
-    ports:
-      - "3001:3001"
-    depends_on:
-      - otel-collector
-    networks:
-      - observability
-    restart: unless-stopped

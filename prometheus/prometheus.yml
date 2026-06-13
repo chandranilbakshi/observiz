@@ -3,12 +3,6 @@ global:
   evaluation_interval: 15s
 
 scrape_configs:
-  # Scrape your API's metrics (if you expose /metrics directly)
-  - job_name: "sarwam-api"
-    static_configs:
-      - targets: ["example-api:3001"]
-    metrics_path: /metrics
-
   # Scrape the OTel collector's own metrics
   - job_name: "otel-collector"
     static_configs:
