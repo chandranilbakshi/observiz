@@ -1,0 +1,7 @@
+{
+  "name": "observiz",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ]
+}
