@@ -83,7 +83,9 @@ services:
     restart: unless-stopped
 
   example-api:
-    build: ./example-api
+    build:
+      context: .
+      dockerfile: example-api/Dockerfile
     container_name: example-api
     environment:
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
