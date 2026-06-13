@@ -2,6 +2,7 @@
   "name": "observiz",
   "private": true,
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "example-api"
   ]
 }
