@@ -1,24 +1,14 @@
 import "./instrumentation.js";
 import express from "express";
-import { trace, metrics } from "@opentelemetry/api";
-import winston from "winston";
-import { OpenTelemetryTransportV3 } from "@opentelemetry/winston-transport";
+import { getLogger, getMeter } from "@observiz/sdk"
+import { trace } from "@opentelemetry/api"
 
-// Winston logger — ships to OTel collector via transport
-export const logger = winston.createLogger({
-  level: "info",
-  format: winston.format.json(),
-  transports: [
-    new winston.transports.Console(),
-    new OpenTelemetryTransportV3(),  // this sends logs to the collector
-  ],
-});
+const logger = getLogger()
+const tracer = trace.getTracer("example-api")
+const meter  = getMeter("example-api")
 
 const app = express();
 app.use(express.json());
-
-const tracer = trace.getTracer("sarwam-api");
-const meter  = metrics.getMeter("sarwam-api");
 
 const httpRequestCounter = meter.createCounter("http_requests_total", {
   description: "Total HTTP requests",
@@ -58,4 +48,4 @@ app.get("/orders", async (req, res) => {
 const PORT = Number(process.env.PORT) || 3001;
 app.listen(PORT, () => {
   logger.info("API started", { port: PORT });
-}):
+});
