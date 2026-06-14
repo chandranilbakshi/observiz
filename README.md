@@ -1,99 +1,91 @@
-# Observability Stack
+# Observiz
 
-A self-hosted observability stack for experimenting with **traces, metrics, and logs** using Docker Compose.
+Self-hosted observability stack for Node/Bun APIs. Spin up a full LGTM stack (Loki, Grafana, Tempo, Prometheus) with OpenTelemetry in one command — no Datadog bill, no data leaving your infrastructure.
 
-This project is a work in progress and currently serves as a testing ground for building a reusable observability setup for API-based applications.
+## What's included
 
-## What’s included
+- **OpenTelemetry Collector** — central pipeline that receives traces, metrics, and logs from your API
+- **Grafana Tempo** — distributed trace storage with per-request timelines
+- **Grafana Loki** — structured log storage, queryable like a database
+- **Prometheus** — metrics storage with RED metrics auto-derived from traces
+- **Grafana** — unified dashboard with trace↔log correlation wired up out of the box
 
-- **OpenTelemetry Collector** — receives telemetry from the API and routes it onward
-- **Tempo** — stores distributed traces
-- **Loki** — stores and queries logs
-- **Prometheus** — stores metrics
-- **Grafana** — visualizes and correlates all signals
-- **Example API** — a small instrumented service used to verify the integration end to end
+## Prerequisites
 
-## Project structure
+- Docker and Docker Compose
 
-```text
-observability-stack/
-├── docker-compose.yml
-├── otel-collector/
-│   └── config.yaml
-├── grafana/
-│   ├── provisioning/
-│   │   ├── datasources/
-│   │   │   └── datasources.yaml
-│   │   └── dashboards/
-│   │       └── dashboards.yaml
-│   └── dashboards/
-│       └── api-overview.json
-├── prometheus/
-│   └── prometheus.yml
-├── tempo/
-│   └── tempo.yaml
-├── loki/
-│   └── loki.yaml
-├── example-api/
-│   ├── src/
-│   │   ├── index.ts
-│   │   └── instrumentation.ts
-│   ├── package.json
-│   └── Dockerfile
-└── README.md
+## Getting started
+
+**1. Clone the repo:**
+```bash
+git clone https://github.com/chandranilbakshi/observiz
+cd observiz
 ```
 
-## Current status
+**2. Start the stack:**
+```bash
+docker compose up -d
+```
 
-This repository is **not a production-ready platform yet**.
+**3. Open Grafana:**
 
-Right now, it is mainly used to:
+Navigate to `http://localhost:3000` — all datasources are pre-configured, no manual setup needed.
 
-- test OTel instrumentation
-- verify telemetry flow through the stack
-- explore how to make the setup reusable for other API projects
+## Instrument your API
 
-## How it works
-
-The example API exports telemetry through OpenTelemetry to the collector.
-From there:
-
-- traces go to **Tempo**
-- metrics go to **Prometheus**
-- logs go to **Loki**
-
-Grafana is configured to connect to all three so you can jump between logs, metrics, and traces.
-
-## Running the stack
-
-1. Make sure Docker and Docker Compose are installed.
-2. Start the stack:
+Install the SDK in your Node or Bun API:
 
 ```bash
-docker compose up --build
+npm install @observiz/sdk
 ```
 
-3. Open Grafana:
+Add one line to your entry point (before any other imports):
 
-- `http://localhost:3000`
+```typescript
+import { initObserviz } from "@observiz/sdk"
 
-4. The example API should be available at:
+initObserviz({ serviceName: "my-api" })
+```
 
-- `http://localhost:3001`
+Set the collector URL via environment variable:
 
-## Example API
+```bash
+OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317
+```
 
-The `example-api` service is intentionally simple. It exists to confirm that observability integration is working before adapting the setup for other projects.
+Your traces, logs, and metrics will start flowing into Grafana immediately.
 
-## Next steps
+→ See the full SDK documentation at [observiz-sdk](https://github.com/chandranilbakshi/observiz-sdk)
 
-Planned improvements include:
+## Ports
 
-- making the instrumentation easier to reuse in other API projects
-- supporting more frameworks or app structures
-- improving documentation and setup instructions
-- cleaning up the demo API into a more reusable integration example
+| Service | Port |
+|---|---|
+| Grafana | 3000 |
+| Loki | 3100 |
+| Tempo | 3200 |
+| Prometheus | 9090 |
+| OTel Collector (gRPC) | 4317 |
+| OTel Collector (HTTP) | 4318 |
 
-## Notes
+## Querying your data in Grafana
 
-This repo is being built in public, so the setup may change as the project evolves.
+**Traces** — Explore → Tempo → Search → filter by service name
+
+**Logs** — Explore → Loki → query `{job="your-service-name"}`
+
+**Metrics** — Explore → Prometheus → query `http_requests_total`
+
+Clicking a trace ID inside a log line jumps directly to the full trace in Tempo. Clicking an exemplar in Prometheus jumps to the corresponding trace.
+
+## Production deployment
+
+For production, replace the local volume storage with object storage:
+
+- Tempo and Loki both support S3, GCS, and Azure Blob as backends
+- Update `tempo/tempo.yml` and `loki/loki.yml` with your storage config
+- Set `GF_AUTH_ANONYMOUS_ENABLED=false` in `docker-compose.yml` and configure Grafana auth
+
+## License
+
+MIT
